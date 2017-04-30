@@ -1,4 +1,21 @@
 var hexer = {
+  hex: function (args) {
+    if (!args) {
+      args = {};
+    }
+    var this_hex = this;
+    this.blocked = args.blocked || false;
+    this.hero = args.hero || false;
+    this.bg = args.bg || "hex_green";
+    this.classes = args.classes || [];
+    this.getClass = function () {
+      var classes = this_hex.classes;
+      classes.push(this_hex.bg);
+      if (this_hex.blocked) classes.push('blocked');
+      return classes.join(' ');
+    }
+    return this;
+  },
   // function found on developerfusion.com
   MultiDimensionalArray: function (iRows,iCols) {
     var i;
@@ -13,18 +30,8 @@ var hexer = {
     return(a);
   },
 
-  toggle_hex: function (x, y) {
-    if(mapArray[x][y]=='hex_tree') {
-      document.getElementById('hex_'+ x +'_' + y).className='hex_green';
-      mapArray[x][y]='hex_green';
-    } else {
-      document.getElementById('hex_'+ x +'_' + y).className='hex_tree';
-      mapArray[x][y]='hex_tree';
-    }
-  },
-
   accessible: function (x,y) {
-    return (game.mapArray[x][y].indexOf('blocked') < 0);
+    return !game.mapArray[x][y].blocked && !game.mapArray[x][y].hero;
   },
 
   distance: function (x1,y1,x2,y2) {
@@ -77,7 +84,6 @@ var hexer = {
 
   // A* Pathfinding with Manhatan Heuristics for Hexagons.
   path: function (from, to) {
-    console.log('PATH',from,to);
     // Check cases path is impossible from the start.
     var error=0;
     if(from.x == to.x && from.y == to.y) error=1;
@@ -228,7 +234,7 @@ var hexer = {
       fullPath.push({x: path[counter][1], y:path[counter][2]});
       //$elem.addClass('path');
       counter--;
-      console.log((total - counter)*200);
+      //console.log((total - counter)*200);
       /*
       (function($elem){
         setTimeout(function(){

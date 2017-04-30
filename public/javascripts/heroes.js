@@ -12,10 +12,11 @@
   gender: 1,
   head: 1,
  */
-game.hero = function (args, $hex) {
+game.hero = function (args) {
   var this_hero = this;
-  this.id = Date.now;
-  this.$hex = $hex;
+  this.id = Date.now();
+  this.hex = game.state.hex;
+  this.$hex = game.state.$hex;
   this.attack = args.attack;
   this.defense = args.defense;
   this.mov = args.mov;
@@ -37,51 +38,57 @@ game.hero = function (args, $hex) {
         from: game.state.hex
       }
     });
-  },
+  };
   this.move = function(args) {
-    var hexx = game.state.hex;
-    console.log(hexx);
+    var hex = game.state.hex;
     var $hex = game.state.$hex;
     if ($hex.hasClass('reacheable')) {
-      var path = hexer.path(args.from, hexx);
-      console.log('path',path);
+      var path = hexer.path(args.from, hex);
       if(path.length) {
         game.state.clear_action();
-        /*
-        var classes = 'blocked hero';
-        var chars_keys = Object.keys(game.chars);
-        for (var i = 0; i < chars_keys.length; i++) {
-          if(args.from.hasClass('hero-' + chars_keys[i])){
-            classes += ' hero-' + chars_keys[i];
-            break;
-          }
-        }
-        args.from.removeClass(classes);
-        $hex.addClass(classes);
-        */
+        this_hero.clear();
+        this_hero.hex = hex;
+        this_hero.$hex = $hex;
+        this_hero.mov_left -= path.length-1;
+        game.world.draw_path(path);
+        this_hero.print();
       }
     }else{
       game.state.clear_action();
     }
-  },
+  };
   this.shoot_targets = function () {
     /*
       con hex_ring de hex.js
       hace un anillo a distancia - 1 y se meten los hex que coinciden con anillo a distancia 1 de target
       y va creciendo lo distancia de target y decreciendo la de origen.
     */
-  },
+  };
+  this.setImages = function () {
+    this_hero.images.push(game.layers.getBG(game.layers.armor[this.armor],this_hero.gender));
+    this_hero.images.push(game.layers.getBG(game.layers.head[this.head],this_hero.gender));
+    this_hero.images.push(game.layers.getBG(game.layers.main[this.main],this_hero.gender));
+    this_hero.images.push(game.layers.getBG(game.layers.sec[this.sec],this_hero.gender));
+  };
   this.print = function () {
-    var basePath = '/images/'+this.gender+'/';
-    var armor = ['clothes','leather_armor','steel_armor'];
-    var head = ['z_head1','z_head2','z_head3'];
-    var main = ['dagger','shortsword','longsword','greatsword',];
-    var getBG = function (img) {
-      return 'url("'+basePath+img+'.png")';
-    }
-    this_hero.images.push(getBG())
-  }
+    console.log(this_hero.hex);
+    game.mapArray[this_hero.hex.x][this_hero.hex.y].hero = this_hero;
+    this_hero.$hex.addClass('hero').find('.hex_caption').css('background-image', this_hero.images.join(','));
+  };
+  this.clear = function () {
+    game.mapArray[this_hero.hex.x][this_hero.hex.y].hero = false;
+    this_hero.$hex.removeClass('hero').find('.hex_caption').css('background-image', '');
+  };
   return this;
+};
+game.layers = {
+  armor: ['clothes','leather_armor','steel_armor'],
+  head: ['z_head1','z_head2','z_head3'],
+  main: ['dagger','shortsword','longsword','greatsword','greataxe'],
+  sec: ['buckler','shield'],
+  getBG: function (img,gender) {
+    if (img !== undefined) return 'url("/images/'+gender+'/'+img+'.png")';
+  }
 };
 game.heroBases = {
   a: {

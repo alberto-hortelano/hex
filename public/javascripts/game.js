@@ -7,17 +7,19 @@ var game = {
     hero: false,
     set_action: function(action) {
       game.state.action = action;
+      $('#action').text(game.state.action.name);
       console.log('set_action: ',game.state.action.name);
     },
     clear_action: function() {
       game.state.action = false;
+      $('#action').text('_______');
       $('.hex.reacheable').removeClass('reacheable');
     },
     run_action: function() {
       if(game.state.action !== false){
         console.log('run_action: ',game.state.action.name);
         game.state.action.run(game.state.action.args);
-        console.log(game.getMap());
+        //console.log(game.getMap());
       }
     },
     load_chars: function() {
@@ -45,15 +47,10 @@ var game = {
         game.state.hex = {x:parseInt(id[0]), y:parseInt(id[1])};
         if(game.state.action !== false){
           game.state.run_action();
-        }else if($hex.hasClass('hero')){
-          game.hero.show_move({radio: 3}, game.state.hex);
-          game.state.set_action({
-            run: game.hero.move,
-            name: 'game.hero.move',
-            args: {
-              from: game.state.hex
-            }
-          });
+        } else if ($hex.hasClass('hero')){
+          game.state.hero = game.mapArray[game.state.hex.x][game.state.hex.y].hero;
+          console.log(game.state.hero);
+          game.state.hero.show_move();
         }else{
           game.state.clear_action();
         }
@@ -67,7 +64,14 @@ var game = {
         });
       });
       $('#next_turn').on('click',function() {
-
+        $('#action').text('next_turn');
+        for (var hero in game.heroes[game.state.turn]) {
+          console.log(hero);
+          if (game.heroes[game.state.turn].hasOwnProperty(hero)) {
+            game.heroes[game.state.turn][hero].mov_left = game.heroes[game.state.turn][hero].mov;
+          }
+        }
+        game.state.turn = game.state.turn === 'a'?'b':'a';
       });
     }
   },
@@ -76,9 +80,11 @@ var game = {
     drop_hero: function(args) {
       var hex = game.state.hex;
       var $hex = game.state.$hex;
-      var newHero = new game.hero(args, $hex);
+      var newHero = new game.hero(args);
       game.heroes[game.state.turn][newHero.id] = newHero;
-      $hex.addClass('blocked hero hero-'+game.state.turn+' hero-'+args.hero_id);
+      newHero.setImages();
+      newHero.print();
+      //$hex.addClass('blocked hero hero-'+game.state.turn+' hero-'+args.hero_id);
       game.state.set_action({
         run: newHero.show_move,
         name: 'newHero.show_move',
@@ -86,26 +92,17 @@ var game = {
           from: hex
         }
       });
-      return;
-      $('.hex.reacheable').removeClass('reacheable');
-      var hero = new game.hero();
-      //var hero = game.heroes[game.state.turn][args.hero_id];
-      $hex.addClass('blocked hero hero-'+game.state.turn+' hero-'+args.hero_id);
-      hero.show_move({radio: 3}, $hex);
-      game.state.set_action({
-        run: hero.move,
-        name: 'hero.move',
-        args: {
-          from: $hex
-        }
-      });
-      var this_hero = $.extend({}, game.chars[args.hero_class]);
-      this_hero.mov_left = this_hero.mov;
-      game.heroes[game.state.turn][args.hero_id] = this_hero;
-      console.log(game.heroes, $hex);
     },
-    create_hero: function(){
-
+    draw_path: function(path){
+      for (var i = 0; i < path.length; i++) {
+        var $hex = $('#'+path[i].x+'_'+path[i].y);
+        $hex.addClass('path');
+        (function($hex){
+          setTimeout(function(){
+            $hex.removeClass('path');
+          },i*100 + 100);
+        })($hex);
+      }
     }
   },
 

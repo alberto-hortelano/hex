@@ -227,13 +227,35 @@ html {
 #mandos.visible {
   right: 0;
 }
+#top-bar {
+  height: 30px;
+  background: red;
+  z-index: 9999;
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+#top-bar div {
+  padding: 0 10px;
+  margin: 0 10px;
+  height: 30px;
+  display: inline-block;
+  float: left;
+  background: blue;
+  vertical-align: middle;
+  line-height: 30px;
+}
+#action {
+  width: 200px;
+  overflow: hidden;
+}
 #tablero {
   background: #000;
   position: fixed;
   bottom: 0;
   right: 0;
   left: 0;
-  top: 0;
+  top: 30px;
   overflow: hidden;
 }
 #map {
@@ -264,6 +286,11 @@ html {
   box-shadow: -1px 2px 5px, -1px 0px 13px inset, -21px 20px 8px 0px rgba(0,0,0,0.1) inset;
 }
 
+@keyframes iddle {
+  to {
+    background-position-x: 3692px;
+  }
+}
 @keyframes move {
   to {
     background-position-x: -7800px;
@@ -283,7 +310,7 @@ html {
   background-image: url(/images/hero/slingshot.png),url(/images/hero/leather_armor.png),url(/images/hero/z_head3.png);
   background-image: url(/images/hero/greatstaff.png),url(/images/hero/clothes.png),url(/images/hero/z_head1.png);
   background-image: url(/images/hero/longbow.png),url(/images/hero/clothes.png),url(/images/hero/z_head2.png);
-  background-image: url(/images/hero/clothes.png),url(/images/hero/z_head3.png);
+  background-image: url(/images/hero/clothes.png),url(/images/hero/z_head3.png),url(/images/hero/greataxe.png);
   background-size: 8000px;
   background-position-x: 200px;
   background-position-y: 200px;
@@ -299,10 +326,11 @@ html {
 .hero .hex_caption {
   background-position: 50% 0%;
   background-size: 4096px;
-  background-position: 876px 226px;
+  background-position: 4076px 226px;
   background-color: transparent;
   filter: saturate(260%) hue-rotate(530deg) brightness(1.8) drop-shadow(5px -3px 0px rgba(0,0,0,0.5));
-  background-image: url(/images/hero/clothes.png),url(/images/hero/z_head3.png),url(/images/hero/shortsword.png),url(/images/hero/buckler.png);
+  background-image: url(/images/hero/clothes.png),url(/images/hero/z_head1.png),url(/images/hero/longsword.png),url(/images/hero/buckler.png);
+  animation: iddle .8s steps(3, end) infinite;
 }
 .hero.hero-warrior .hex_caption {
   background-image: url(/images/hero/clothes.png),url(/images/hero/z_head3.png),url(/images/hero/shortsword.png),url(/images/hero/buckler.png);
@@ -417,8 +445,11 @@ html {
   left: 56px;
   transform: rotate(120deg);
 }
-.hex_caption span {
+#map.show_coords .hex_caption span {
   display: block;
+}
+.hex_caption span {
+  display: none;
 }
 .hex_caption {
   width: 86px;
