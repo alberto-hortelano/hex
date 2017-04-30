@@ -1,0 +1,436 @@
+html {
+  margin: 0px;
+  padding: 0px;
+  overflow: hidden;
+}
+
+body {
+  margin: 0px;
+  padding: 0px;
+}
+
+::-webkit-scrollbar-thumb {
+  display: none;
+}
+
+input[type="checkbox"]:disabled
+{
+  opacity: .3;
+}
+
+div#content {
+  background-color: #dddddd;
+  margin: 0px;
+  padding: 0px;
+}
+
+div#inner-content {
+  background-color: #dddddd;
+  margin: 10px;
+  width: 100%;
+  height: 100%;
+}
+
+.top-titlebar {
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  width: 100%;
+  height: 32px;
+  background-color: #7a7c7c;
+  -webkit-user-select: none;
+  -webkit-app-region: drag;
+}
+
+.bottom-titlebar {
+  position: absolute;
+  left: 0px;
+  bottom: 0px;
+  width: 100%;
+  height: 32px;
+  background-color: #7a7c7c;
+  -webkit-user-select: none;
+  -webkit-app-region: drag;
+}
+
+.left-titlebar {
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  width: 32px;
+  height: 100%;
+  background-color: #7a7c7c;
+  -webkit-user-select: none;
+  -webkit-app-region: drag;
+}
+
+.right-titlebar {
+  position: absolute;
+  right: 0px;
+  top: 0px;
+  width: 32px;
+  height: 100%;
+  background-color: #7a7c7c;
+  -webkit-user-select: none;
+  -webkit-app-region: drag;
+}
+
+.top-titlebar-icon,
+.bottom-titlebar-icon {
+  position: absolute;
+  left: 6px;
+  margin-top: 6px;
+  margin-bottom: 6px;
+}
+
+.left-titlebar-icon {
+  position: absolute;
+  bottom: 6px;
+  margin-left: 6px;
+  margin-right: 6px;
+}
+
+.right-titlebar-icon {
+  position: absolute;
+  top: 6px;
+  margin-left: 6px;
+  margin-right: 6px;
+}
+
+.top-titlebar-text,
+.bottom-titlebar-text {
+  position: absolute;
+  left: 32px;
+  width: 80%;
+  margin-top: 6px;
+  margin-bottom: 6px;
+  font-family: Arial;
+  font-size: 11pt;
+  color: #ffffff;
+}
+
+.left-titlebar-text {
+  position: absolute;
+  bottom: 32px;
+  width: 100px;
+  margin-left: 6px;
+  margin-right: 6px;
+  font-family: Arial;
+  font-size: 12pt;
+  color: #ffffff;
+  -webkit-transform: rotate(-90deg) translate(0, 100%);
+  -webkit-transform-origin: 0% 100%;
+}
+
+.right-titlebar-text {
+  position: absolute;
+  top: 0px;
+  width: 100px;
+  margin-left: 6px;
+  margin-right: 6px;
+  font-family: Arial;
+  font-size: 12pt;
+  color: #ffffff;
+  -webkit-transform: rotate(90deg) translate(0, 100%);
+  -webkit-transform-origin: 0% 200%;
+}
+
+.top-titlebar-close-button,
+.bottom-titlebar-close-button {
+  position: absolute;
+  right: 11px;
+  width: 17px;
+  height: 17px;
+  margin-top: 6px;
+  margin-bottom: 6px;
+  -webkit-app-region: no-drag;
+}
+
+.left-titlebar-close-button {
+  position: absolute;
+  top: 11px;
+  width: 17px;
+  height: 17px;
+  margin-left: 6px;
+  margin-right: 6px;
+  -webkit-app-region: no-drag;
+}
+
+.right-titlebar-close-button {
+  position: absolute;
+  bottom: 11px;
+  width: 17px;
+  height: 17px;
+  margin-left: 6px;
+  margin-right: 6px;
+  -webkit-app-region: no-drag;
+}
+
+.top-titlebar-divider {
+  position: absolute;
+  left: 0px;
+  top: 31px;
+  width: 100%;
+  height: 1px;
+  background-color: #2a2c2c;
+}
+
+.bottom-titlebar-divider {
+  position: absolute;
+  left: 0px;
+  bottom: 31px;
+  width: 100%;
+  height: 1px;
+  background-color: #2a2c2c;
+}
+
+.left-titlebar-divider {
+  position: absolute;
+  left: 31px;
+  top: 0px;
+  width: 1px;
+  height: 100%;
+  background-color: #2a2c2c;
+}
+
+.right-titlebar-divider {
+  position: absolute;
+  right: 31px;
+  top: 0px;
+  width: 1px;
+  height: 100%;
+  background-color: #2a2c2c;
+}
+
+/*************************************/
+
+* {
+  -webkit-user-select: none;
+}
+
+html {
+  background-color: #eee;
+}
+#mandos {
+  position: fixed;
+  box-sizing: border-box;
+  width: 100%;
+  top: 0;
+  bottom: 0;
+  right: 100%;
+  overflow: auto;
+  z-index: 999;
+  margin: 0;
+  padding: 50px;
+  background-color: rgba(0,0,0,0.8);
+}
+#mandos.visible {
+  right: 0;
+}
+#tablero {
+  background: #000;
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  top: 0;
+  overflow: hidden;
+}
+#map {
+  width: 2250px;
+  height: 1400px;
+  overflow: hidden;
+  background-size: 300px;
+}
+
+/* HEROES */
+#heroes {
+  float: left;
+  background: rgb(221, 164, 115);
+  width: 100%;
+  padding: 30px;
+  box-sizing: border-box;
+}
+#heroes .hero {
+  float: left;
+  font-family: 'Architects Daughter', cursive;
+  background: rgb(221, 164, 115);
+  border: 9px solid rgb(158, 82, 42);
+  margin: 0 5px 10px 5px;
+  border-style: groove;
+  padding: 0 10px 20px 10px;
+  cursor: pointer;
+  border-radius: 5px;
+  box-shadow: -1px 2px 5px, -1px 0px 13px inset, -21px 20px 8px 0px rgba(0,0,0,0.1) inset;
+}
+
+@keyframes move {
+  to {
+    background-position-x: -7800px;
+  }
+}
+#heroes .team.a .hero.h1 .hero_preview {
+  background-image: url(/images/heroine/buckler.png),url(/images/heroine/clothes.png),url(/images/heroine/head_long.png);
+  background-image: url(/images/heroine/shortsword.png),url(/images/heroine/clothes.png),url(/images/heroine/head_long.png);
+  background-image: url(/images/heroine/dagger.png),url(/images/heroine/steel_armor.png),url(/images/heroine/head_long.png);
+  background-image: url(/images/heroine/greatsword.png),url(/images/heroine/leather_armor.png),url(/images/heroine/head_long.png);
+  background-image: url(/images/heroine/longsword.png),url(/images/heroine/clothes.png),url(/images/heroine/head_long.png);
+  background-image: url(/images/hero/staff.png),url(/images/hero/steel_armor.png),url(/images/hero/z_head1.png);
+  background-image: url(/images/hero/greatbow.png),url(/images/hero/steel_armor.png),url(/images/hero/z_head2.png);
+  background-image: url(/images/hero/shortbow.png),url(/images/hero/steel_armor.png),url(/images/hero/z_head3.png);
+  background-image: url(/images/hero/rod.png),url(/images/hero/leather_armor.png),url(/images/hero/z_head1.png);
+  background-image: url(/images/hero/shield.png),url(/images/hero/leather_armor.png),url(/images/hero/z_head2.png);
+  background-image: url(/images/hero/slingshot.png),url(/images/hero/leather_armor.png),url(/images/hero/z_head3.png);
+  background-image: url(/images/hero/greatstaff.png),url(/images/hero/clothes.png),url(/images/hero/z_head1.png);
+  background-image: url(/images/hero/longbow.png),url(/images/hero/clothes.png),url(/images/hero/z_head2.png);
+  background-image: url(/images/hero/clothes.png),url(/images/hero/z_head3.png);
+  background-size: 8000px;
+  background-position-x: 200px;
+  background-position-y: 200px;
+  background-color: transparent;
+  width: 150px;
+  height: 180px;
+  margin: 0 auto;
+  animation: move 6s steps(32, start) infinite;
+}
+.inner_span:hover {
+  background-color: #444;
+}
+.hero .hex_caption {
+  background-position: 50% 0%;
+  background-size: 4096px;
+  background-position: 876px 226px;
+  background-color: transparent;
+  filter: saturate(260%) hue-rotate(530deg) brightness(1.8) drop-shadow(5px -3px 0px rgba(0,0,0,0.5));
+  background-image: url(/images/hero/clothes.png),url(/images/hero/z_head3.png),url(/images/hero/shortsword.png),url(/images/hero/buckler.png);
+}
+.hero.hero-warrior .hex_caption {
+  background-image: url(/images/hero/clothes.png),url(/images/hero/z_head3.png),url(/images/hero/shortsword.png),url(/images/hero/buckler.png);
+}
+.hero.hero-archer .hex_caption {
+  background-image: url(/images/archer.png);
+}
+
+.hex, .hex_l, .hex_r, .hex_inner {
+  width: 100px;
+  height: 86px;
+}
+.hex_l, .hex_r {
+  visibility: hidden;
+  overflow: hidden;
+  position: absolute;
+}
+.hex {
+  height: 0;
+  position: relative;
+  transition: all .3s;
+}
+.hex.reacheable .hex_inner {
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.2) inset, 0 0 0 50px rgba(255,255,255,0.1) inset;
+}
+.hex.reacheable.blocked .hex_inner {
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.2) inset;
+}
+.hex.wall .hex_caption span:before {
+  content: "";
+  background-image: url(/images/walls/stoneWallAged_W.png);
+  background-position: 4px -113px;
+  background-size: 140px;
+  position: absolute;
+  top: -50px;
+  left: 0px;
+  width: 130px;
+  height: 136px;
+  z-index: 9;
+}
+.hex.tree .hex_inner {
+  background-image: url(/images/trees.png),url(/images/grass.jpg);
+  background-size: 280px;
+}
+.hex.tree_1 .hex_inner {
+  background-position: 7px 80px;
+}
+.hex.tree_2 .hex_inner {
+  background-position: 4px -9px;
+}
+.hex.tree_3 .hex_inner {
+  background-position: 193px 175px;
+}
+.hex.path .hex_inner {
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.2) inset, 0 0 0 50px rgba(255,255,255,0.2) inset;
+}
+.hex_l {
+  -moz-transform: rotate(60deg);
+  -ms-transform: rotate(60deg);
+  -o-transform: rotate(60deg);
+  -webkit-transform: rotate(60deg);
+  transform: rotate(60deg);
+}
+.hex_r {
+  -moz-transform: rotate(-120deg);
+  -ms-transform: rotate(-120deg);
+  -o-transform: rotate(-120deg);
+  -webkit-transform: rotate(-120deg);
+  transform: rotate(-120deg);
+}
+.hex_inner {
+  display: block;
+  visibility: visible;
+  -moz-transform: rotate(60deg);
+  -ms-transform: rotate(60deg);
+  -o-transform: rotate(60deg);
+  -webkit-transform: rotate(60deg);
+  transform: rotate(60deg);
+  background-position: center;
+  background-color: transparent;
+  box-shadow: 0 0px 0px 1px rgba(255,255,255,0.2) inset;
+  background-image: url(/images/grass.jpg);
+  background-size: 300px;
+}
+.hex_inner:after,
+.hex_inner:before,
+.hex_caption:after,
+.hex_caption:before {
+  content: '';
+  position: absolute;
+  width: 48px;
+  height: 1px;
+  background-color: rgba(255,255,255,0.2);
+}
+.hex_inner:before {
+  top: 22px;
+  left: -11px;
+  transform: rotate(120deg);
+}
+.hex_inner:after {
+  top: 22px;
+  left: 63px;
+  transform: rotate(60deg);
+}
+.hex_caption:before {
+  top: 64px;
+  left: -18px;
+  transform: rotate(60deg);
+}
+.hex_caption:after {
+  top: 64px;
+  left: 56px;
+  transform: rotate(120deg);
+}
+.hex_caption span {
+  display: block;
+}
+.hex_caption {
+  width: 86px;
+  height: 86px;
+  position: absolute;
+  top: 0px;
+  right: 7px;
+  border-radius: 100%;
+  background-color: transparent;
+  cursor: pointer;
+  z-index: 99;
+}
+.hex_caption:hover + .hex_l .hex_inner {
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.2) inset, 0 0 0 50px rgba(255,255,255,0.2) inset;
+}
