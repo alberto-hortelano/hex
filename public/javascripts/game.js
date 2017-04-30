@@ -6,11 +6,17 @@ var game = {
     $hex: false,
     hero: false,
     set_action: function(action) {
-      game.state.action = action;
-      $('#action').text(game.state.action.name);
-      console.log('set_action: ',game.state.action.name);
+      console.log(game.state.action.name, action.name);
+      if (game.state.action.name === action.name) {
+        game.state.clear_action();
+      } else {
+        game.state.action = action;
+        $('#action').text(game.state.action.name);
+        console.log('set_action: ',game.state.action.name);
+      }
     },
     clear_action: function() {
+      console.log('clear_action: ',game.state.action.name);
       game.state.action = false;
       $('#action').text('_______');
       $('.hex.reacheable').removeClass('reacheable');
@@ -26,11 +32,14 @@ var game = {
       var heroes_cards = '';
       for (var team in game.heroBases) {
         heroes_cards += `<div class="team ${team}">`
-        for (var heroe in game.heroBases[team]) {
+        for (var hero in game.heroBases[team]) {
+          var h = new game.hero(game.heroBases[team][hero]);
+          h.setImages();
+          var bgs = h.images.join(',');
           heroes_cards += `
-            <div class="hero ${heroe}" data-hero_id="${heroe}">
-              <h2>${heroe}</h2>
-              <div class="hero_preview"></div>
+            <div class="hero ${hero}" data-hero_id="${hero}">
+              <h2>${hero}</h2>
+              <div class="hero_preview" style='background-image: ${bgs}'></div>
               <div class="hero_button attack">Attack</div>
               <div class="hero_button move">Move</div>
             </div>`;
@@ -45,12 +54,12 @@ var game = {
         var id = game.state.$hex.attr('id').split('_');
         var $hex = game.state.$hex;
         game.state.hex = {x:parseInt(id[0]), y:parseInt(id[1])};
-        if(game.state.action !== false){
-          game.state.run_action();
-        } else if ($hex.hasClass('hero')){
+        if ($hex.hasClass('hero')){
           game.state.hero = game.mapArray[game.state.hex.x][game.state.hex.y].hero;
           console.log(game.state.hero);
           game.state.hero.show_move();
+        } else if (game.state.action !== false){
+          game.state.run_action();
         }else{
           game.state.clear_action();
         }
@@ -78,6 +87,7 @@ var game = {
 
   world: {
     drop_hero: function(args) {
+      console.log(args);
       var hex = game.state.hex;
       var $hex = game.state.$hex;
       var newHero = new game.hero(args);

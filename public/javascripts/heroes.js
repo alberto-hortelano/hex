@@ -17,20 +17,19 @@ game.hero = function (args) {
   this.id = Date.now();
   this.hex = game.state.hex;
   this.$hex = game.state.$hex;
-  this.attack = args.attack;
-  this.defense = args.defense;
-  this.mov = args.mov;
-  this.mov_left = args.mov;
-  this.main = 1;
-  this.sec = 2;
-  this.range = 3;
-  this.armor = 0;
-  this.shield = 2;
-  this.gender = 'hero';
-  this.head = 1;
+  this.attack = args.attack || 3;
+  this.defense = args.defense || 3;
+  this.mov = args.mov || 7;
+  this.mov_left = this.mov;
+  this.main = args.main || 0;
+  this.sec = args.sec || 0;
+  this.range = args.range || 0;
+  this.armor = args.armor || 0;
+  this.gender = args.gender || 'hero';
+  this.head = args.head || 1;
   this.images = [];
   this.show_move = function() {
-    movimento_disponible(this_hero.mov_left, this_hero.$hex, true);
+    hexer.movimento_disponible(this_hero.mov_left, this_hero.hex);
     game.state.set_action({
       run: this_hero.move,
       name: 'this_hero.move',
@@ -83,50 +82,35 @@ game.hero = function (args) {
 };
 game.layers = {
   armor: ['clothes','leather_armor','steel_armor'],
-  head: ['z_head1','z_head2','z_head3'],
+  head: [null,'z_head1','z_head2','z_head3'],
   main: ['dagger','shortsword','longsword','greatsword','greataxe'],
-  sec: ['buckler','shield'],
+  sec: [null, 'buckler','shield'],
   getBG: function (img,gender) {
-    if (img !== undefined) return 'url("/images/'+gender+'/'+img+'.png")';
+    if (typeof img === 'string') return 'url("/images/'+gender+'/'+img+'.png")';
   }
 };
 game.heroBases = {
   a: {
     h1: {
-      attack: 5,
-      defense: 3,
-      mov: 4,
-      main: 1,
+      main: 3,
       sec: 2,
-      range: 3,
       armor: 0,
-      shield: 2,
-      mov_left: 4,
-      gender: 1,
+      gender: 'hero',
       head: 1,
-
     },
     h2: {
-      attack: 5,
-      defense: 3,
-      mov: 4,
-      mov_left: 4,
       main: 1,
-      sec: 2,
-      range: 3,
+      sec: 1,
       armor: 0,
-      shield: 2
+      gender: 'heroine',
+      head: 1,
     },
     h3: {
-      attack: 5,
-      defense: 3,
-      mov: 4,
-      mov_left: 4,
-      main: 1,
-      sec: 2,
-      range: 3,
-      armor: 0,
-      shield: 2
+      main: 2,
+      sec: 0,
+      armor: 2,
+      gender: 'hero',
+      head: 2,
     }
   },
   b: {

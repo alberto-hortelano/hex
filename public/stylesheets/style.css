@@ -296,7 +296,7 @@ html {
     background-position-x: -7800px;
   }
 }
-#heroes .team.a .hero.h1 .hero_preview {
+#heroes .hero .hero_preview {
   background-image: url(/images/heroine/buckler.png),url(/images/heroine/clothes.png),url(/images/heroine/head_long.png);
   background-image: url(/images/heroine/shortsword.png),url(/images/heroine/clothes.png),url(/images/heroine/head_long.png);
   background-image: url(/images/heroine/dagger.png),url(/images/heroine/steel_armor.png),url(/images/heroine/head_long.png);

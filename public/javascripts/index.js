@@ -58,35 +58,6 @@ $(document).ready(function() {
   //$('#tablero').animate({ scrollTop: $('#tablero')[0].scrollHeight});
 });
 
-function movimento_disponible(radio, $hex, first){
-  if(radio == 0)return;
-  // neighbors
-  var id;
-  if($hex instanceof jQuery){
-    if($hex.hasClass('blocked') && !first) return;
-    id = $hex.attr('id').split("_");
-  }else{
-    id = $hex.split("_");
-  }
-
-  var x = parseInt(id[0], 10);
-  var y = parseInt(id[1], 10);
-  var n = [(x+1)+'_'+(y-1),(x+1)+'_'+(y),(x)+'_'+(y+1),(x-1)+'_'+(y+1),(x-1)+'_'+(y),(x)+'_'+(y-1)];
-  radio--;
-
-  for (var i = 0; i < n.length; i++) {
-    var $new_hex = $('#'+n[i]);
-    if($new_hex.length){
-      $new_hex.addClass('reacheable');
-      movimento_disponible(radio, $new_hex);
-    }else{
-      movimento_disponible(radio, n[i]);
-    }
-  }
-}
-
-
-
 // Draw the map of Hexagons into the div map
 function draw_map() {
   hex_width = 74;

@@ -244,5 +244,13 @@ var hexer = {
       */
     }
     return fullPath;
+  },
+  movimento_disponible: function (radius, hex){
+    var ring = hexer.hex_ring(hex.x,hex.y,radius);
+    for (var i = 0; i < ring.length; i++) {
+      $('#'+ring[i]).addClass('reacheable');
+    }
+    radius--;
+    if(radius > 0) hexer.movimento_disponible(radius, hex);
   }
 };
