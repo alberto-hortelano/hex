@@ -1,3 +1,18 @@
+document.fullscreenEnabled = document.fullscreenEnabled || document.mozFullScreenEnabled || document.documentElement.webkitRequestFullScreen;
+
+function requestFullscreen(element) {
+	if (element.requestFullscreen) {
+		element.requestFullscreen();
+	} else if (element.mozRequestFullScreen) {
+		element.mozRequestFullScreen();
+	} else if (element.webkitRequestFullScreen) {
+		element.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
+	}
+}
+
+if (document.fullscreenEnabled) {
+	requestFullscreen(document.documentElement);
+}
 
 $(document).ready(function() {
   draw_map();
@@ -9,6 +24,9 @@ $(document).ready(function() {
       return false;
     }
     return true;
+  });
+  $('#select_hero').click(function(e){
+    $('#mandos').toggleClass('visible');
   });
 
   $('#toggle_coords').click(function () {
@@ -22,6 +40,11 @@ $(document).ready(function() {
     }
   });
 
+  if (document.fullscreenEnabled) {
+  	$('#full_screen').click(function () {
+  	  requestFullscreen(document.documentElement);
+  	});
+  }
 
   $(document).keydown(function(event) {
     switch (event.which) {
@@ -46,7 +69,7 @@ $(document).ready(function() {
 
   game.state.bind_events();
 
-  game.state.load_chars();
+  game.state.print_preview();
 
   return;
   var radius = hex_ring(8, 6, 3);
@@ -70,9 +93,11 @@ function draw_map() {
   for (x=0; x < game.mapsize_x; x++) {
     for (y=0; y < game.mapsize_y; y++) {
       if (x + y < hex_offset || x + y >= 2*game.mapsize_x - hex_offset) {
+        delete game.mapArray[x][y];
         continue;
       }
       if (x - y > hex_offset || y - x > hex_offset) {
+        delete game.mapArray[x][y];
         continue;
       }
       var hex = game.mapArray[x][y];
@@ -81,11 +106,11 @@ function draw_map() {
       //hex_y = (x-hex_offset * -43)+(y-hex_offset*43)+offset ;
       hex_tiles +='<div id="'+ x + '_' + y +'" class="hex '+hex.getClass()+'" style="position:absolute;z-index:'+z_index+';left:' + hex_x + 'px;top:' + hex_y + 'px;">';
       hex_tiles +='<div id="hex_' + x + '_' + y + '" class="hex_caption">';
-      hex_tiles +='<span id="hex_coords_' + x + '_' + y + '" style="position:absolute;left:24px;top:15px;">'+x+','+y+'</span>';
+      hex_tiles +='<span class="hex_coords">'+x+','+y+'</span>';
       hex_tiles +='</div>';
       hex_tiles += '<div class="hex_l"><div class="hex_r"><div class="hex_inner"';
         if(hex.classes.length === 1) hex_tiles += ' style="background-position:'+hexer.getRandomInt(0,101)+'% '+hexer.getRandomInt(0,101)+'%;"';
-      hex_tiles += '></div></div></div>';
+      hex_tiles += '><span class="combat"></span><span class="mov"></span></div></div></div>';
       hex_tiles += '</div>';
     }
     z_index--;

@@ -7,19 +7,14 @@ var game = {
     hero: false,
     set_action: function(action) {
       console.log(game.state.action.name, action.name);
-      if (game.state.action.name === action.name) {
-        game.state.clear_action();
-      } else {
-        game.state.action = action;
-        $('#action').text(game.state.action.name);
-        console.log('set_action: ',game.state.action.name);
-      }
+      game.state.action = action;
+      $('#action').text(game.state.action.name);
+      console.log('set_action: ',game.state.action.name);
     },
     clear_action: function() {
       console.log('clear_action: ',game.state.action.name);
       game.state.action = false;
       $('#action').text('_______');
-      $('.hex.reacheable').removeClass('reacheable');
     },
     run_action: function() {
       if(game.state.action !== false){
@@ -28,25 +23,29 @@ var game = {
         //console.log(game.getMap());
       }
     },
-    load_chars: function() {
-      var heroes_cards = '';
-      for (var team in game.heroBases) {
-        heroes_cards += `<div class="team ${team}">`
-        for (var hero in game.heroBases[team]) {
-          var h = new game.hero(game.heroBases[team][hero]);
-          h.setImages();
-          var bgs = h.images.join(',');
-          heroes_cards += `
-            <div class="hero ${hero}" data-hero_id="${hero}">
-              <h2>${hero}</h2>
-              <div class="hero_preview" style='background-image: ${bgs}'></div>
-              <div class="hero_button attack">Attack</div>
-              <div class="hero_button move">Move</div>
-            </div>`;
-        }
-        heroes_cards += '</div>';
+    set_hero: function(hero) {
+      if (game.heroes[game.state.turn][hero.id] !== undefined) { // Clicked same team hero
+        game.state.clear_hero();
+        game.state.hero = hero;
+        game.state.hero.show_move();
+        hero.$hex.addClass('active_hero');
       }
-      $('#heroes').append(heroes_cards);
+    },
+    clear_hero: function() {
+      if(game.state.hero !== false) game.state.hero.$hex.removeClass('active_hero');
+      $('.hex.reacheable').removeClass('reacheable');
+      game.state.hero = false;
+    },
+    print_preview: function() {
+      var args = {};
+      var $inputs = $('#heroes .stats input,#heroes .stats select');
+      $inputs.each(function () {
+        args[$(this).attr('id')] = $(this).val();
+      });
+      var newHero = new game.hero(args);
+      newHero.setImages();
+      $('#heroes .hero_preview').css('background-image', newHero.images.join(','));
+      return args;
     },
     bind_events: function(){
       $('.hex_caption').click(function() {
@@ -55,9 +54,15 @@ var game = {
         var $hex = game.state.$hex;
         game.state.hex = {x:parseInt(id[0]), y:parseInt(id[1])};
         if ($hex.hasClass('hero')){
-          game.state.hero = game.mapArray[game.state.hex.x][game.state.hex.y].hero;
-          console.log(game.state.hero);
-          game.state.hero.show_move();
+          var targetHero = game.mapArray[game.state.hex.x][game.state.hex.y].hero;
+          if (game.heroes[game.state.turn][targetHero.id] !== undefined) { // Clicked same team hero
+            game.state.set_hero(targetHero);
+          } else if (game.state.hero) { // Clicked other team hero
+            if (game.state.hero.adjacent(game.state.hex)) {
+              game.state.hero.attack(targetHero);
+              console.log('ATTACK!!!');
+            }
+          }
         } else if (game.state.action !== false){
           game.state.run_action();
         }else{
@@ -68,25 +73,30 @@ var game = {
         $('#mandos').removeClass('visible');
         game.state.set_action({
           run: game.world.drop_hero,
-          name: 'game.world.drop_hero',
-          args: game.heroBases[game.state.turn][$(this).data('hero_id')]
+          name: 'game.world.drop_hero'
         });
       });
       $('#next_turn').on('click',function() {
         $('#action').text('next_turn');
         for (var hero in game.heroes[game.state.turn]) {
-          console.log(hero);
           if (game.heroes[game.state.turn].hasOwnProperty(hero)) {
-            game.heroes[game.state.turn][hero].mov_left = game.heroes[game.state.turn][hero].mov;
+            game.heroes[game.state.turn][hero].calc_move();
           }
         }
         game.state.turn = game.state.turn === 'a'?'b':'a';
+        game.state.clear_hero();
+        $(this).text('Turn: '+game.state.turn.toUpperCase());
+      });
+      $('#heroes .stats select').change(game.state.print_preview);
+      $('#rotate').on('input',function () {
+        $('#heroes .hero_preview').css('background-position-y', 192*$(this).val());
       });
     }
   },
 
   world: {
-    drop_hero: function(args) {
+    drop_hero: function() {
+      var args = game.state.print_preview();
       console.log(args);
       var hex = game.state.hex;
       var $hex = game.state.$hex;

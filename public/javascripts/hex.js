@@ -31,7 +31,7 @@ var hexer = {
   },
 
   accessible: function (x,y) {
-    return !game.mapArray[x][y].blocked && !game.mapArray[x][y].hero;
+    return game.mapArray[x][y] !== undefined && !game.mapArray[x][y].blocked && !game.mapArray[x][y].hero;
   },
 
   distance: function (x1,y1,x2,y2) {
@@ -43,40 +43,172 @@ var hexer = {
     //return dx + dy;
   },
 
+  movimento_disponible_ant: function (radius, hex){
+    var step = 0;
+    var done = {};
+    var reacheable = [];
+    reacheable[0] = [hex];
+    done[hex.x +'_'+hex.y] = true;
+    while (step < radius) {
+      step++;
+      var tabs = '';
+      if (reacheable[step] === undefined) {
+        reacheable[step] = [];
+      } else {
+        for (var i = 0; i < reacheable[step].length; i++) {
+          var id = reacheable[step][i].x+'_'+reacheable[step][i].y;
+          $('#'+id).addClass('reacheable').children('.hex_caption').children().text(step);
+          done[id] = true;
+        }
+      }
+      for (var i = 0; i < reacheable[step-1].length; i++) {
+        tabs += ' - ';
+        var adjacents = hexer.adjacents(reacheable[step-1][i]);
+        for (var j = 0; j < adjacents.length; j++) {
+          if (done[adjacents[j].x +'_'+adjacents[j].y] !== true) {
+            // send one steps away for each enemy on adjacents
+            var adj = hexer.adjacents(adjacents[j],true);
+            var toStep = adj.reduce(function(total, h){
+              var currentHex = game.mapArray[h.x][h.y];
+              if(h.x == 17 && h.y == 5) console.log(h.x,h.y,total,+ (currentHex.hero !== false && currentHex.hero.team !== game.state.turn),currentHex.hero);
+              return total + (currentHex !== undefined && currentHex.hero !== false && currentHex.hero.team !== game.state.turn);
+            }, step);
+            console.log('toStep',toStep);
+            if(toStep === step) {
+              done[adjacents[j].x +'_'+adjacents[j].y] = true;
+            } else if (reacheable[toStep] === undefined) {
+              reacheable[toStep] = [];
+            }
+            reacheable[toStep].push(adjacents[j]);
+          }
+        }
+      }
+      for (var i = 0; i < reacheable[step].length; i++) {
+        $('#'+reacheable[step][i].x+'_'+reacheable[step][i].y).addClass('reacheable').children('.hex_caption').children().text(step);
+      }
+    }
+    console.log(reacheable);
+  },
+  movimento_disponible: function (radius, hex) {
+    radius++;
+    var step = 0;
+    var done = {};
+    var reacheable = [];
+    reacheable[0] = [hex];
+    for (var i = 1; i < radius; i++) {
+      reacheable[i] = [];
+    }
+    //console.log(JSON.stringify(reacheable));
+    done[hex.x +'_'+hex.y] = true;
+    while (step < radius) {
+      step++;
+      //console.log(step-1,reacheable[step-1].length,JSON.stringify(reacheable[step-1]));
+      for (var i = 0; i < reacheable[step-1].length; i++) {
+        var baseHex = reacheable[step-1][i];
+        var enemies = hexer.adjacents(baseHex, 'enemies').length;
+        var adjacents = hexer.adjacents(baseHex);
+        //console.log(baseHex,enemies,adjacents);
+        //continue;
+        for (var j = 0; j < adjacents.length; j++) {
+          //console.log('JJJJJJJ',step,j);
+          if(step + enemies < radius && done[adjacents[j].x +'_'+adjacents[j].y] !== true) {
+            if(enemies === 0) done[adjacents[j].x +'_'+adjacents[j].y] = true;
+            //console.log(step,JSON.stringify(reacheable),adjacents[j]);
+            reacheable[step + enemies].push(adjacents[j]);
+          }
+          if (reacheable[step] && reacheable[step].length>100) {
+            console.log('ERROR ##############################');
+            return;
+          }
+        }
+      }
+    }
+    //console.log(reacheable);
+    step = 1;
+    var done = {};
+    while (step < radius) {
+      for (var i = 0; i < reacheable[step].length; i++) {
+        var id = reacheable[step][i].x+'_'+reacheable[step][i].y;
+        if (done[id] !== true) {
+          $('#'+id).addClass('reacheable').children('.hex_caption').children().children().text(step);
+          done[id] = true;
+        }
+      }
+      step++;
+    }
+  },
   getRandomInt: function (min, max) {
     return Math.floor(Math.random() * (max - min)) + min;
   },
 
-  hex_ring: function (x, y, radius){
+  adjacents: function (h, all){
+    var result = [];
+    var x = h.x;
+    var y = h.y;
+    var h;
+    var check = function (x,y) {
+      if (game.mapArray[x] === undefined || game.mapArray[x][y] === undefined) {
+        return false;
+      }
+      if (all === true) return true;
+      var hex = game.mapArray[x][y];
+      if (all === 'enemies') return hex.hero !== false && hex.hero.team !== game.state.turn;
+      return hexer.accessible(x,y);
+    }
+    h = {x: x + 1, y: y};// x+1, y
+    if(check(h.x,h.y)) result.push(h);
+    h = {x: x, y: y + 1};// x, y+1
+    if(check(h.x,h.y)) result.push(h);
+    h = {x: x - 1, y: y+1};// x-1, y+1
+    if(check(h.x,h.y)) result.push(h);
+    h = {x: x - 1, y: y};// x-1, y
+    if(check(h.x,h.y)) result.push(h);
+    h = {x: x, y: y - 1};// x, y-1
+    if(check(h.x,h.y)) result.push(h);
+    h = {x: x + 1, y: y - 1};// x+1, y-1
+    if(check(h.x,h.y)) result.push(h);
+    return result;
+  },
+
+  hex_ring: function (hex, radius){
+    var x = hex.x;
+    var y = hex.y;
     var results = [];
     var r = radius;
+    var h;
     while(r > 0){ // 1
-      results.push(x + r +'_'+ (y + radius - r) );
+      h = {x: x + r, y: y + radius - r};
+      if(hexer.accessible(h.x,h.y)) results.push(h);
       r--;
     }
     r = radius;
     while(r > 0){ // 2
-      results.push(x + r - radius +'_'+ (y + radius) );
+      h = {x: x + r - radius, y: y + radius};
+      if(hexer.accessible(h.x,h.y)) results.push(h);
       r--;
     }
     r = radius;
     while(r > 0){ // 3
-      results.push(x - radius +'_'+ (y + r) );
+      h = {x: x - radius, y: y + r};
+      if(hexer.accessible(h.x,h.y)) results.push(h);
       r--;
     }
     r = radius;
     while(r > 0){ // 4
-      results.push(x - r +'_'+ (y + r - radius));
+      h = {x: x - r, y: y + r - radius};
+      if(hexer.accessible(h.x,h.y)) results.push(h);
       r--;
     }
     r = radius;
     while(r > 0){ // 5
-      results.push(x - r + radius +'_'+ (y - radius));
+      h = {x: x - r + radius, y: y - radius};
+      if(hexer.accessible(h.x,h.y)) results.push(h);
       r--;
     }
     r = radius;
     while(r > 0){ // 6
-      results.push(x + radius +'_'+ (y - r));
+      h = {x: x + radius, y: y - r};
+      if(hexer.accessible(h.x,h.y)) results.push(h);
       r--;
     }
     return results;
@@ -244,13 +376,5 @@ var hexer = {
       */
     }
     return fullPath;
-  },
-  movimento_disponible: function (radius, hex){
-    var ring = hexer.hex_ring(hex.x,hex.y,radius);
-    for (var i = 0; i < ring.length; i++) {
-      $('#'+ring[i]).addClass('reacheable');
-    }
-    radius--;
-    if(radius > 0) hexer.movimento_disponible(radius, hex);
   }
 };
