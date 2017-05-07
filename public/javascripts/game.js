@@ -42,12 +42,14 @@ var game = {
       $inputs.each(function () {
         args[$(this).attr('id')] = $(this).val();
       });
+      args.orientation = $('#orientation').val();
       var newHero = new game.hero(args);
       newHero.setImages();
       $('#heroes .hero_preview').css('background-image', newHero.images.join(','));
       return args;
     },
     bind_events: function(){
+      $('#tablero').addClass('turn_'+game.state.turn);
       $('.hex_caption').click(function() {
         game.state.$hex = $(this).parent();
         var id = game.state.$hex.attr('id').split('_');
@@ -83,13 +85,15 @@ var game = {
             game.heroes[game.state.turn][hero].calc_move();
           }
         }
+        var turn_ant = game.state.turn;
         game.state.turn = game.state.turn === 'a'?'b':'a';
         game.state.clear_hero();
         $(this).text('Turn: '+game.state.turn.toUpperCase());
+        $('#tablero').removeClass('turn_'+turn_ant).addClass('turn_'+game.state.turn);
       });
       $('#heroes .stats select').change(game.state.print_preview);
-      $('#rotate').on('input',function () {
-        $('#heroes .hero_preview').css('background-position-y', 192*$(this).val());
+      $('#orientation').on('input',function () {
+        $('#heroes .hero_preview').css('background-position-y', game.world.get_orientation(parseInt($(this).val()),192));
       });
     }
   },
@@ -123,6 +127,33 @@ var game = {
           },i*100 + 100);
         })($hex);
       }
+    },
+    get_orientation: function (val, step) {
+      step = step || 128;
+      var orientation = 0;
+      switch (val) {
+        case 1:
+          orientation = step * 6;
+          break;
+        case 2:
+          orientation = step * 7;
+          break;
+        case 3:
+          orientation = step * 1;
+          break;
+        case 4:
+          orientation = step * 2;
+          break;
+        case 5:
+          orientation = step * 3;
+          break;
+        case 6:
+          orientation = step * 5;
+          break;
+        default:
+          orientation = step * 6;
+      }
+      return orientation;
     }
   },
 

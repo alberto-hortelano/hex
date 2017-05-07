@@ -1,41 +1,28 @@
 
-/*
-  attack: 5,
-  defense: 3,
-  mov: 4,
-  main: 1,
-  sec: 2,
-  range: 3,
-  armor: 0,
-  shield: 2,
-  mov_left: 4,
-  gender: 1,
-  head: 1,
- */
 game.hero = function (args) {
   var this_hero = this;
   this.id = Date.now();
-  this.team = args.team || game.state.turn;
   this.hex = game.state.hex;
   this.$hex = game.state.$hex;
-  this.combat = args.combat || 7;
-  this.combat = parseInt(this.combat);
-  //this.defense = args.defense || 3;
-  this.mov = args.mov || 7;
-  this.mov = parseInt(this.mov);
+  this.combat = parseInt(args.combat || 7);
+  this.mov = parseInt(args.mov || 7);
   this.mov_left = this.mov;
-  this.main = args.main || 0;
-  this.main = parseInt(this.main);
-  this.sec = args.sec || 0;
-  this.sec = parseInt(this.sec);
-  this.range = args.range || 0;
-  this.armor = args.armor || 0;
-  this.armor = parseInt(this.armor);
-  this.gender = args.gender || 'hero';
-  this.head = args.head || 1;
+  this.main = parseInt(args.main || 0);
+  this.sec = parseInt(args.sec || 0);
+  this.range = parseInt(args.range || 0);
+  this.armor = parseInt(args.armor || 0);
+  this.head = parseInt(args.head || 1);
+  this.orientation = parseInt(args.orientation || 0);
+  this.gender = args.gender || 'hero'; // hero || heroine
+  this.team = args.team || game.state.turn;
   this.images = [];
-  this_hero.charge = 0;
+  this.charge = 0;
+
   this.attack = function (target) {
+    target.orientation = hexer.orientation(target.hex, this_hero.hex);
+    this_hero.orientation = hexer.orientation(this_hero.hex, target.hex);
+    this_hero.print();
+    target.print();
     var wp_damage = 0;
     switch (this_hero.main) {
       case 4:
@@ -44,8 +31,12 @@ game.hero = function (args) {
       default:
         wp_damage = this_hero.main + 1;
     }
-    console.log('attack',this_hero.combat , wp_damage , this_hero.charge);
-    target.resist(this_hero.combat + wp_damage + this_hero.charge);
+    this_hero.$hex.addClass('attack');
+    setTimeout(function(){
+      this_hero.$hex.removeClass('attack');
+      console.log('attack',this_hero.combat , wp_damage , this_hero.charge);
+      target.resist(this_hero.combat + wp_damage + this_hero.charge + 2);
+    },600);
   };
   this.resist = function (damage) {
     var received = damage - this_hero.combat - this_hero.armor - this_hero.sec;
@@ -93,9 +84,10 @@ game.hero = function (args) {
         this_hero.clear();
         this_hero.hex = hex;
         this_hero.$hex = $hex;
-        this_hero.mov_left -= parseInt($hex.children('.hex_caption').children().children().text());
+        this_hero.mov_left -= parseInt($hex.children('.hex_caption').children('.steps').text());
         game.world.draw_path(path);
         this_hero.charge = (path.length > 3)? path.length - 3: 0;
+        this_hero.orientation = hexer.orientation(path[path.length - 2], hex);
         this_hero.print();
       }
       game.state.set_hero(this_hero);
@@ -123,13 +115,14 @@ game.hero = function (args) {
   this.print = function () {
     console.log(this_hero.hex);
     game.mapArray[this_hero.hex.x][this_hero.hex.y].hero = this_hero;
-    this_hero.$hex.addClass('hero').find('.hex_caption').css('background-image', this_hero.images.join(','));
+    this_hero.$hex.addClass('hero team_'+this.team).find('.hex_caption').css('background-image', this_hero.images.join(','));
     this_hero.$hex.find('.combat').css('border-left-width', this_hero.combat * 5);
     this_hero.$hex.find('.mov').css('border-left-width', this_hero.mov * 5);
+    this_hero.$hex.find('.hex_caption').css('background-position-y', game.world.get_orientation(this_hero.orientation)-30);
   };
   this.clear = function () {
     game.mapArray[this_hero.hex.x][this_hero.hex.y].hero = false;
-    this_hero.$hex.removeClass('hero').find('.hex_caption').css('background-image', '');
+    this_hero.$hex.removeClass('hero active_hero team_a team_b').find('.hex_caption').css('background-image', '');
   };
   this.calc_move();
   return this;

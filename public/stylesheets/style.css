@@ -288,7 +288,7 @@ html {
   border-radius: 5px;
   box-shadow: -1px 2px 5px, -1px 0px 13px inset, -21px 20px 8px 0px rgba(0,0,0,0.1) inset;
 }
-#heroes #rotate {
+#heroes #orientation {
   float: left;
   width: 25%;
   margin-right: 24%;
@@ -309,6 +309,11 @@ html {
     background-position-x: -7800px;
   }
 }
+@keyframes attack {
+  to {
+    background-position-x: 2026px;
+  }
+}
 #heroes .stats {
   float: left;
   width: 50%;
@@ -323,7 +328,7 @@ html {
   float: left;
   margin-right: 24%;
   background-size: 6144px;
-  background-position: 6144px 0px;
+  background-position: 6144px 384px;
   background-color: transparent;
   width: 200px;
   height: 192px;
@@ -343,6 +348,17 @@ html {
   filter: saturate(40%) hue-rotate(280deg) brightness(1);
   background-image: url(/images/hero/clothes.png),url(/images/hero/z_head1.png),url(/images/hero/longsword.png),url(/images/hero/buckler.png);
   animation: iddle .8s steps(3, end) infinite;
+}
+.hero.team_a .hex_inner .combat {
+  border-left-color: black;
+}
+.hero.team_b .hex_inner .combat {
+  border-left-color: red;
+}
+
+.hero.attack .hex_caption {
+  background-position-x: 2536px;
+  animation: attack .4s steps(4, end);
 }
 
 .hero .hex_inner .combat,
@@ -392,6 +408,19 @@ html {
 }
 .hex.reacheable.blocked .hex_inner {
   box-shadow: 0 0 0 1px rgba(255,255,255,0.2) inset;
+}
+.hex.reacheable .steps {
+  display: block;
+}
+.hex .steps {
+  display: none;
+  position: absolute;
+  top: 27px;
+  left: 20px;
+  font-size: 30px;
+  color: #c0c0c0;
+  width: 46px;
+  text-align: center;
 }
 .hex.wall .hex_caption span:before {
   content: "";
@@ -479,7 +508,7 @@ html {
   left: 56px;
   transform: rotate(120deg);
 }
-#map.show_coords .hex_caption span {
+#map.show_coords .hex_caption .hex_coords {
   display: block;
 }
 .hex_caption .hex_coords {

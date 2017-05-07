@@ -106,7 +106,7 @@ function draw_map() {
       //hex_y = (x-hex_offset * -43)+(y-hex_offset*43)+offset ;
       hex_tiles +='<div id="'+ x + '_' + y +'" class="hex '+hex.getClass()+'" style="position:absolute;z-index:'+z_index+';left:' + hex_x + 'px;top:' + hex_y + 'px;">';
       hex_tiles +='<div id="hex_' + x + '_' + y + '" class="hex_caption">';
-      hex_tiles +='<span class="hex_coords">'+x+','+y+'</span>';
+      hex_tiles +='<span class="hex_coords">'+x+','+y+'</span><span class="steps"></span>';
       hex_tiles +='</div>';
       hex_tiles += '<div class="hex_l"><div class="hex_r"><div class="hex_inner"';
         if(hex.classes.length === 1) hex_tiles += ' style="background-position:'+hexer.getRandomInt(0,101)+'% '+hexer.getRandomInt(0,101)+'%;"';

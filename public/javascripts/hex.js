@@ -130,7 +130,7 @@ var hexer = {
       for (var i = 0; i < reacheable[step].length; i++) {
         var id = reacheable[step][i].x+'_'+reacheable[step][i].y;
         if (done[id] !== true) {
-          $('#'+id).addClass('reacheable').children('.hex_caption').children().children().text(step);
+          $('#'+id).addClass('reacheable').children('.hex_caption').children('.steps').text(step);
           done[id] = true;
         }
       }
@@ -168,6 +168,31 @@ var hexer = {
     h = {x: x + 1, y: y - 1};// x+1, y-1
     if(check(h.x,h.y)) result.push(h);
     return result;
+  },
+
+  orientation: function (a,b) {
+    var orientation = 0;
+    if (a.x + 1 === b.x) {
+      if (a.y - 1 === b.y) {
+        orientation = 1;
+      } else if (a.y === b.y) {
+        orientation = 6;
+      }
+    } else if (a.x === b.x) {
+      if (a.y - 1 === b.y) {
+        orientation = 2;
+      } else if (a.y + 1 === b.y) {
+        orientation = 5;
+      }
+    } else if (a.x - 1 === b.x) {
+      if (a.y === b.y) {
+        orientation = 3;
+      } else if (a.y + 1 === b.y) {
+        orientation = 4;
+      }
+    }
+    console.log(orientation);
+    return orientation;
   },
 
   hex_ring: function (hex, radius){
