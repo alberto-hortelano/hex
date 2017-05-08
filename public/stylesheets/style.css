@@ -344,8 +344,8 @@ html {
   background-size: 4096px;
   background-position: 4076px 226px;
   background-color: transparent;
-  filter: saturate(260%) hue-rotate(530deg) brightness(1.8) drop-shadow(5px -3px 0px rgba(0,0,0,0.5));
-  filter: saturate(40%) hue-rotate(280deg) brightness(1);
+  /*filter: saturate(260%) hue-rotate(530deg) brightness(1.8) drop-shadow(5px -3px 0px rgba(0,0,0,0.5));*/
+  /*filter: saturate(40%) hue-rotate(280deg) brightness(1);*/
   background-image: url(/images/hero/clothes.png),url(/images/hero/z_head1.png),url(/images/hero/longsword.png),url(/images/hero/buckler.png);
   animation: iddle .8s steps(3, end) infinite;
 }
@@ -359,6 +359,10 @@ html {
 .hero.attack .hex_caption {
   background-position-x: 2536px;
   animation: attack .4s steps(4, end);
+}
+.hero.fall .hex_caption {
+  background-position-x: 1140px;
+  animation: none;
 }
 
 .hero .hex_inner .combat,

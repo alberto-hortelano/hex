@@ -1,9 +1,9 @@
 
 game.hero = function (args) {
   var this_hero = this;
-  this.id = Date.now();
-  this.hex = game.state.hex;
-  this.$hex = game.state.$hex;
+  this.id = Math.floor((Math.random() * 10000000) + 1);
+  this.hex = args.hex || game.state.hex;
+  this.$hex = args.$hex || (args.hex !== undefined)? $('#'+args.hex.x+'_'+args.hex.y): game.state.$hex;
   this.combat = parseInt(args.combat || 7);
   this.mov = parseInt(args.mov || 7);
   this.mov_left = this.mov;
@@ -17,6 +17,7 @@ game.hero = function (args) {
   this.team = args.team || game.state.turn;
   this.images = [];
   this.charge = 0;
+  this.ko = false;
 
   this.attack = function (target) {
     target.orientation = hexer.orientation(target.hex, this_hero.hex);
@@ -35,23 +36,31 @@ game.hero = function (args) {
     setTimeout(function(){
       this_hero.$hex.removeClass('attack');
       console.log('attack',this_hero.combat , wp_damage , this_hero.charge);
-      target.resist(this_hero.combat + wp_damage + this_hero.charge + 2);
+      target.resist(this_hero.combat + wp_damage + this_hero.charge + 2,this_hero);
     },600);
   };
-  this.resist = function (damage) {
+  this.resist = function (damage,attacker) {
     var received = damage - this_hero.combat - this_hero.armor - this_hero.sec;
     console.log('received',received,damage,- this_hero.combat - this_hero.armor - this_hero.sec);
     while (received > 0) {
-      if (this_hero.combat > this_hero.mov) {
-        this_hero.combat--;
-      } else {
+      if (this_hero.mov > this_hero.combat) {
         this_hero.mov--;
+      } else {
+        this_hero.combat--;
       }
       received--;
     }
-    this_hero.$hex.find('.combat').css('border-left-width', this_hero.combat * 5);
-    this_hero.$hex.find('.mov').css('border-left-width', this_hero.mov * 5);
-    console.log(this_hero.combat,this_hero.mov);
+    if (this_hero.mov < 1) {
+      this_hero.fall();
+      attacker.show_move();
+    }
+    this_hero.calc_move();
+    this_hero.$hex.find('.combat').css('border-left-width', Math.max(0,this_hero.combat * 5));
+    this_hero.$hex.find('.mov').css('border-left-width', Math.max(0,this_hero.mov * 5));
+  };
+  this.fall = function () {
+    this_hero.ko = true;
+    this_hero.$hex.addClass('fall');
   };
   this.show_move = function() {
     $('.hex.reacheable').removeClass('reacheable');
@@ -113,7 +122,7 @@ game.hero = function (args) {
     if (this_hero.head > 0) this_hero.images.push(game.layers.getBG(game.layers.head[this_hero.head],this_hero.gender));
   };
   this.print = function () {
-    console.log(this_hero.hex);
+    console.log(this_hero);
     game.mapArray[this_hero.hex.x][this_hero.hex.y].hero = this_hero;
     this_hero.$hex.addClass('hero team_'+this.team).find('.hex_caption').css('background-image', this_hero.images.join(','));
     this_hero.$hex.find('.combat').css('border-left-width', this_hero.combat * 5);
@@ -136,65 +145,62 @@ game.layers = {
     if (typeof img === 'string') return 'url("/images/'+gender+'/'+img+'.png")';
   }
 };
-game.heroBases = {
-  a: {
-    h1: {
-      mov: 3,
-      main: 3,
-      sec: 2,
-      armor: 0,
-      gender: 'hero',
-      head: 1,
-    },
-    h2: {
-      mov: 4,
-      main: 1,
-      sec: 1,
-      armor: 0,
-      gender: 'heroine',
-      head: 1,
-    },
-    h3: {
-      main: 2,
-      sec: 0,
-      armor: 2,
-      gender: 'hero',
-      head: 2,
-    }
-  },
-  b: {
-    h1: {
-      attack: 5,
-      defense: 3,
-      mov: 4,
-      mov_left: 4,
-      main: 1,
-      sec: 2,
-      range: 3,
-      armor: 0,
-      shield: 2
-    },
-    h2: {
-      attack: 5,
-      defense: 3,
-      mov: 4,
-      mov_left: 4,
-      main: 1,
-      sec: 2,
-      range: 3,
-      armor: 0,
-      shield: 2
-    },
-    h3: {
-      attack: 5,
-      defense: 3,
-      mov: 4,
-      mov_left: 4,
-      main: 1,
-      sec: 2,
-      range: 3,
-      armor: 0,
-      shield: 2
-    }
+game.heroBases = [
+  {
+    team: 'a',
+    hex: {x:12,y:6},
+    main: 4,
+    sec: 0,
+    armor: 0,
+    orientation: 5
+  },{
+    team: 'a',
+    hex: {x:13,y:5},
+    main: 4,
+    sec: 0,
+    armor: 0,
+    orientation: 5
+  },{
+    team: 'a',
+    hex: {x:14,y:4},
+    main: 3,
+    sec: 2,
+    armor: 0,
+    orientation: 5
+  },{
+    team: 'a',
+    hex: {x:11,y:7},
+    main: 3,
+    sec: 2,
+    armor: 0,
+    orientation: 5
+  },{
+    team: 'b',
+    hex: {x:22,y:15},
+    main: 3,
+    sec: 2,
+    armor: 3,
+    orientation: 3
+  },{
+    team: 'b',
+    hex: {x:20,y:16},
+    main: 3,
+    sec: 2,
+    armor: 3,
+    orientation: 3
+  },{
+    team: 'b',
+    hex: {x:19,y:17},
+    main: 3,
+    sec: 2,
+    armor: 3,
+    orientation: 3
+  },{
+    team: 'b',
+    hex: {x:18,y:18},
+    main: 3,
+    sec: 2,
+    armor: 3,
+    orientation: 3
   }
-};
+];

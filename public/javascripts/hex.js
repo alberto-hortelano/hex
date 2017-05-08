@@ -152,7 +152,7 @@ var hexer = {
       }
       if (all === true) return true;
       var hex = game.mapArray[x][y];
-      if (all === 'enemies') return hex.hero !== false && hex.hero.team !== game.state.turn;
+      if (all === 'enemies') return hex.hero !== false && hex.hero.team !== game.state.turn && !hex.hero.ko;
       return hexer.accessible(x,y);
     }
     h = {x: x + 1, y: y};// x+1, y

@@ -10,16 +10,25 @@ function requestFullscreen(element) {
 	}
 }
 
-if (document.fullscreenEnabled) {
-	requestFullscreen(document.documentElement);
-}
-
 $(document).ready(function() {
   draw_map();
   document.oncontextmenu = function() {return false;};
 
   $(document).mousedown(function(e){
     if( e.button == 2 ) {
+			var id = $(e.target).parent().attr('id');
+			if (id !== undefined && id.length > 2 && id.indexOf('_') > 0) {
+				var split = id.split('_');
+				var hero = game.mapArray[split[0]][split[1]].hero;
+				if (hero !== false) {
+					console.log(hero);
+		      var $inputs = $('#heroes .stats input,#heroes .stats select');
+		      $inputs.each(function () {
+						$(this).val(hero[$(this).attr('id')]);
+		      });
+					game.state.print_preview();
+				}
+			}
       $('#mandos').toggleClass('visible');
       return false;
     }
@@ -70,6 +79,14 @@ $(document).ready(function() {
   game.state.bind_events();
 
   game.state.print_preview();
+	game.heroes['a'] = {};
+	game.heroes['b'] = {};
+	for (var i = 0; i < game.heroBases.length; i++) {
+		var newHero = new game.hero(game.heroBases[i]);
+		game.heroes[newHero.team][newHero.id] = newHero;
+		newHero.setImages();
+		newHero.print();
+	}
 
   return;
   var radius = hex_ring(8, 6, 3);
