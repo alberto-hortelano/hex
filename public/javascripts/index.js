@@ -10,7 +10,19 @@ function requestFullscreen(element) {
 	}
 }
 
+var socket = io();
 $(document).ready(function() {
+
+  socket.on('newPlayer', function(data){
+		console.log('newPlayer',data);
+  });
+  socket.on('enemyClick', function(id){
+		console.log('enemyClick',id);
+		game.onClick($('#'+id));
+  });
+  socket.on('connect', function(){
+    socket.emit('requestOldPlayers', {});
+  });
   draw_map();
   document.oncontextmenu = function() {return false;};
 

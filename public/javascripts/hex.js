@@ -38,9 +38,25 @@ var hexer = {
     dx = Math.abs(x1-x2);
     dy = Math.abs(y2-y1);
     return Math.sqrt((dx*dx) + (dy*dy));
-    //dx = Math.abs(x1-x2);
-    //dy = Math.abs(y1-y2);
-    //return dx + dy;
+  },
+  min_path: function (a,b) {
+    if (a.x <= b.x && a.y <= b.y) { // >
+      return b.x - a.x + b.y - a.y;
+    } else if (a.x >= b.x && a.y >= b.y) { // <
+      return a.x - b.x + a.y - b.y;
+    } else if (a.x < b.x && a.y > b.y) { // ^
+      if (a.x + a.y < b.x + b.y) { //  /|
+        return b.x - a.x;
+      } else { //  |\
+        return a.y - b.y;
+      }
+    } else if (a.x > b.x && a.y < b.y) { // v
+      if (a.x + a.y < b.x + b.y) { //  \|
+        return b.y - a.y;
+      } else { //  |/
+        return a.x - b.x;
+      }
+    }
   },
 
   movimento_disponible_ant: function (radius, hex){
@@ -146,13 +162,14 @@ var hexer = {
     var x = h.x;
     var y = h.y;
     var h;
+    var team = game.mapArray[x][y].hero.team || game.state.turn;
     var check = function (x,y) {
       if (game.mapArray[x] === undefined || game.mapArray[x][y] === undefined) {
         return false;
       }
       if (all === true) return true;
       var hex = game.mapArray[x][y];
-      if (all === 'enemies') return hex.hero !== false && hex.hero.team !== game.state.turn && !hex.hero.ko;
+      if (all === 'enemies') return hex.hero !== false && hex.hero.team !== team && !hex.hero.ko;
       return hexer.accessible(x,y);
     }
     h = {x: x + 1, y: y};// x+1, y

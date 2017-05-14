@@ -16,32 +16,41 @@ game.hero = function (args) {
   this.gender = args.gender || 'hero'; // hero || heroine
   this.team = args.team || game.state.turn;
   this.images = [];
-  this.charge = 0;
+  this.origin = this.hex;
   this.ko = false;
-
   this.attack = function (target) {
     target.orientation = hexer.orientation(target.hex, this_hero.hex);
     this_hero.orientation = hexer.orientation(this_hero.hex, target.hex);
     this_hero.print();
     target.print();
-    var wp_damage = 0;
+    var extra_damage = 0;
+    var charge = Math.max(0,hexer.min_path(this_hero.origin,target.hex) - 4);
     switch (this_hero.main) {
       case 4:
-        wp_damage = 6;
+        extra_damage = 1 + charge;
         break;
       default:
-        wp_damage = this_hero.main + 1;
+        extra_damage = Math.floor(charge/2);
     }
+    var enemies = hexer.adjacents(this_hero.hex, 'enemies').length - 1;
+    console.log('enemies',enemies,extra_damage);
+    extra_damage -= enemies;
     this_hero.$hex.addClass('attack');
+    this.origin = this.hex;
     setTimeout(function(){
       this_hero.$hex.removeClass('attack');
-      console.log('attack',this_hero.combat , wp_damage , this_hero.charge);
-      target.resist(this_hero.combat + wp_damage + this_hero.charge + 2,this_hero);
+      console.log('attack',this_hero.combat + this_hero.main , extra_damage, enemies , charge);
+      target.resist(this_hero.combat + this_hero.main + extra_damage,this_hero);
     },600);
   };
   this.resist = function (damage,attacker) {
-    var received = damage - this_hero.combat - this_hero.armor - this_hero.sec;
-    console.log('received',received,damage,- this_hero.combat - this_hero.armor - this_hero.sec);
+    var factor = 2;
+    var received = Math.round(10 * (damage + factor) / (this_hero.combat + this_hero.armor + this_hero.sec + factor));
+    received -= 7;
+    var enemies = hexer.adjacents(this_hero.hex, 'enemies').length - 1;
+    console.log('enemies',enemies);
+    received += enemies;
+    console.log('received',received,damage, this_hero.combat + this_hero.armor + this_hero.sec);
     while (received > 0) {
       if (this_hero.mov > this_hero.combat) {
         this_hero.mov--;
@@ -95,7 +104,6 @@ game.hero = function (args) {
         this_hero.$hex = $hex;
         this_hero.mov_left -= parseInt($hex.children('.hex_caption').children('.steps').text());
         game.world.draw_path(path);
-        this_hero.charge = (path.length > 3)? path.length - 3: 0;
         this_hero.orientation = hexer.orientation(path[path.length - 2], hex);
         this_hero.print();
       }
@@ -104,8 +112,11 @@ game.hero = function (args) {
       game.state.clear_action();
     }
   };
+  this.new_turn = function () {
+    this_hero.origin = this_hero.hex;
+    this_hero.calc_move();
+  }
   this.calc_move = function () {
-    this_hero.charge = 0;
     this_hero.mov_left = this_hero.mov - this_hero.armor - +(this_hero.main > 2) - +(this_hero.sec > 1);
   };
   this.shoot_targets = function () {
@@ -149,58 +160,58 @@ game.heroBases = [
   {
     team: 'a',
     hex: {x:12,y:6},
-    main: 4,
-    sec: 0,
-    armor: 0,
+    main: 3,
+    sec: 2,
+    armor: 3,
     orientation: 5
   },{
     team: 'a',
     hex: {x:13,y:5},
-    main: 4,
-    sec: 0,
-    armor: 0,
+    main: 3,
+    sec: 2,
+    armor: 3,
     orientation: 5
   },{
     team: 'a',
     hex: {x:14,y:4},
     main: 3,
     sec: 2,
-    armor: 0,
+    armor: 3,
     orientation: 5
   },{
     team: 'a',
     hex: {x:11,y:7},
     main: 3,
     sec: 2,
-    armor: 0,
+    armor: 3,
     orientation: 5
   },{
     team: 'b',
-    hex: {x:22,y:15},
-    main: 3,
+    hex: {x:18,y:10},
+    main: 2,
     sec: 2,
     armor: 3,
     orientation: 3
   },{
     team: 'b',
-    hex: {x:20,y:16},
-    main: 3,
-    sec: 2,
-    armor: 3,
+    hex: {x:17,y:11},
+    main: 4,
+    sec: 0,
+    armor: 0,
     orientation: 3
   },{
     team: 'b',
-    hex: {x:19,y:17},
-    main: 3,
+    hex: {x:16,y:12},
+    main: 2,
     sec: 2,
-    armor: 3,
+    armor: 2,
     orientation: 3
   },{
     team: 'b',
-    hex: {x:18,y:18},
+    hex: {x:15,y:13},
     main: 3,
     sec: 2,
-    armor: 3,
+    armor: 1,
     orientation: 3
   }
 ];

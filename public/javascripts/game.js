@@ -51,25 +51,8 @@ var game = {
     bind_events: function(){
       $('#tablero').addClass('turn_'+game.state.turn);
       $('.hex_caption').click(function() {
-        game.state.$hex = $(this).parent();
-        var id = game.state.$hex.attr('id').split('_');
-        var $hex = game.state.$hex;
-        game.state.hex = {x:parseInt(id[0]), y:parseInt(id[1])};
-        if ($hex.hasClass('hero')){
-          var targetHero = game.mapArray[game.state.hex.x][game.state.hex.y].hero;
-          if (game.heroes[game.state.turn][targetHero.id] !== undefined) { // Clicked same team hero
-            game.state.set_hero(targetHero);
-          } else if (game.state.hero) { // Clicked other team hero
-            if (game.state.hero.adjacent(game.state.hex)) {
-              game.state.hero.attack(targetHero);
-              console.log('ATTACK!!!');
-            }
-          }
-        } else if (game.state.action !== false){
-          game.state.run_action();
-        }else{
-          game.state.clear_action();
-        }
+        socket.emit('enemyClick', $(this).attr('id'));
+        game.onClick($(this));
       });
       $('#heroes').on('click','.hero',function() {
         $('#mandos').removeClass('visible');
@@ -82,7 +65,7 @@ var game = {
         $('#action').text('next_turn');
         for (var hero in game.heroes[game.state.turn]) {
           if (game.heroes[game.state.turn].hasOwnProperty(hero)) {
-            game.heroes[game.state.turn][hero].calc_move();
+            game.heroes[game.state.turn][hero].new_turn();
           }
         }
         var turn_ant = game.state.turn;
@@ -95,6 +78,28 @@ var game = {
       $('#orientation').on('input',function () {
         $('#heroes .hero_preview').css('background-position-y', game.world.get_orientation(parseInt($(this).val()),192));
       });
+    }
+  },
+
+  onClick: function ($this) {
+    game.state.$hex = $this.parent();
+    var id = game.state.$hex.attr('id').split('_');
+    var $hex = game.state.$hex;
+    game.state.hex = {x:parseInt(id[0]), y:parseInt(id[1])};
+    if ($hex.hasClass('hero')){
+      var targetHero = game.mapArray[game.state.hex.x][game.state.hex.y].hero;
+      if (game.heroes[game.state.turn][targetHero.id] !== undefined) { // Clicked same team hero
+        game.state.set_hero(targetHero);
+      } else if (game.state.hero) { // Clicked other team hero
+        if (game.state.hero.adjacent(game.state.hex)) {
+          game.state.hero.attack(targetHero);
+          console.log('ATTACK!!!');
+        }
+      }
+    } else if (game.state.action !== false){
+      game.state.run_action();
+    }else{
+      game.state.clear_action();
     }
   },
 

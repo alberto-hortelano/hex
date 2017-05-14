@@ -349,6 +349,9 @@ html {
   background-image: url(/images/hero/clothes.png),url(/images/hero/z_head1.png),url(/images/hero/longsword.png),url(/images/hero/buckler.png);
   animation: iddle .8s steps(3, end) infinite;
 }
+.hero.team_b .hex_caption {
+  filter: brightness(0);
+}
 .hero.team_a .hex_inner .combat {
   border-left-color: black;
 }
