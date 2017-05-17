@@ -4,24 +4,25 @@
  * Module dependencies.
  */
 
-var app = require('../app');
-var debug = require('debug')('mando:server');
-var http = require('http');
+const app = require('../app');
+const debug = require('debug')('mando:server');
+const http = require('http');
+const url = require('url');
 
 /**
  * Get port from environment and store in Express.
  */
 
-var port = normalizePort(process.env.PORT || '8080');
+const port = normalizePort(process.env.PORT || '8080');
 app.set('port', port);
 
 /**
  * Create HTTP server.
  */
 
-var server = http.createServer(app);
+const server = http.createServer(app);
 
-var io = require('socket.io')(server);
+const io = require('socket.io')(server);
 
 
 /**
@@ -92,29 +93,44 @@ function onListening() {
   debug('Listening on ' + bind);
   console.log('Listening on ' + bind);
 }
-
-var players = {
-  a: false,
-  b:false
-};
+const games = [];
+const game = function () {
+  return {
+    a: false,
+    b:false
+  };
+}
 
 io.on('connection', function(socket){
-
+  const gameName = socket.handshake.headers.referer.replace('http://'+socket.handshake.headers.host+'/', '');
+  if (!games[gameName]) games[gameName] = game();
+  const players = games[gameName];
   var id = socket.id;
 
   if (players.a === false) {
     players.a = id;
   } else if (players.b === false) {
     players.b = id;
+  	const getRandomInt = function (min, max) {
+	    return Math.floor(Math.random() * (max - min + 1)) + min;
+  	}
+    const trees = {};
+  	for (x=0; x  < 30; x++) {
+      trees[x] = {};
+  	  for (y=0; y < 30; y++) {
+        trees[x][y] = getRandomInt(0,100);
+  	  }
+  	}
+    io.sockets.emit('drawMap', trees);
   } else {
     console.log('no more players');
   }
   console.log('a user connected',id, players);
 
-  socket.broadcast.emit('newPlayer', players);
+  socket.emit('newPlayer', players, id);
 
-  socket.on('requestOldPlayers', function(){
-  });
+  //socket.broadcast.emit('newPlayer', players);
+
   socket.on('enemyClick', function(data){
     socket.broadcast.emit('enemyClick', data);
   });

@@ -13,17 +13,30 @@ function requestFullscreen(element) {
 var socket = io();
 $(document).ready(function() {
 
-  socket.on('newPlayer', function(data){
-		console.log('newPlayer',data);
+  socket.on('newPlayer', function(players,id){
+		console.log('newPlayer',players);
+		if (players.a === id) {
+			$('#message').text('A');
+			$('#tablero').addClass('player_a');
+		} else {
+			$('#message').text('B');
+			$('#tablero').addClass('player_b');
+		}
   });
   socket.on('enemyClick', function(id){
 		console.log('enemyClick',id);
 		game.onClick($('#'+id));
   });
+  socket.on('next_turn', function(){
+		game.next_turn();
+  });
   socket.on('connect', function(){
     socket.emit('requestOldPlayers', {});
   });
-  draw_map();
+	socket.on('drawMap', function (trees) {
+		console.log(trees);
+		draw_map(trees);
+	});
   document.oncontextmenu = function() {return false;};
 
   $(document).mousedown(function(e){
@@ -88,30 +101,11 @@ $(document).ready(function() {
 
   //$('#map').draggable({ containment: "parent" });
 
-  game.state.bind_events();
 
-  game.state.print_preview();
-	game.heroes['a'] = {};
-	game.heroes['b'] = {};
-	for (var i = 0; i < game.heroBases.length; i++) {
-		var newHero = new game.hero(game.heroBases[i]);
-		game.heroes[newHero.team][newHero.id] = newHero;
-		newHero.setImages();
-		newHero.print();
-	}
-
-  return;
-  var radius = hex_ring(8, 6, 3);
-  console.log(radius);
-  for (var i = 0; i < radius.length; i++) {
-    $('#'+radius[i]).addClass('reacheable');
-  }
-
-  //$('#tablero').animate({ scrollTop: $('#tablero')[0].scrollHeight});
 });
 
 // Draw the map of Hexagons into the div map
-function draw_map() {
+function draw_map(trees) {
   hex_width = 74;
   hex_tiles = "";
   row_type = 1;
@@ -119,6 +113,21 @@ function draw_map() {
   offset= ((game.mapsize_x/2)*(hex_width-hex_offset));
   console.log(offset);
   z_index=game.mapsize_x;
+	game.mapArray = hexer.MultiDimensionalArray(30,30);
+	for (x=0; x  < game.mapsize_x; x++) {
+	  for (y=0; y < game.mapsize_y; y++) {
+	    var hasTree = trees[x][y];
+	    if (hasTree < 2) {
+	      game.mapArray[x][y] = new hexer.hex({blocked:true,classes:["tree","tree_1"]});
+	    } else if(hasTree < 5) {
+	      game.mapArray[x][y] = new hexer.hex({blocked:true,classes:["tree","tree_2"]});
+	    } else if(hasTree < 10) {
+	      game.mapArray[x][y] = new hexer.hex({blocked:true,classes:["tree","tree_3"]});
+	    } else {
+	      game.mapArray[x][y] = new hexer.hex();
+	    }
+	  }
+	}
   for (x=0; x < game.mapsize_x; x++) {
     for (y=0; y < game.mapsize_y; y++) {
       if (x + y < hex_offset || x + y >= 2*game.mapsize_x - hex_offset) {
@@ -150,6 +159,17 @@ function draw_map() {
     round--;
     //$('.hero_preview').css('background-position-x', (250*round-50)+'px');
   },180);
+	game.heroes['a'] = {};
+	game.heroes['b'] = {};
+	for (var i = 0; i < game.heroBases.length; i++) {
+		var newHero = new game.hero(game.heroBases[i]);
+		game.heroes[newHero.team][newHero.id] = newHero;
+		newHero.setImages();
+		newHero.print();
+	}
+  game.state.bind_events();
+
+  game.state.print_preview();
 }
 
 var map1 = {

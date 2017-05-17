@@ -1,5 +1,6 @@
 
 
+/*
 function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
@@ -17,7 +18,6 @@ for (x=0; x  < game.mapsize_x; x++) {
     }
   }
 }
-/*
 game.mapArray[15][13] = new hexer.hex({blocked:true,classes:["wall"]});
 game.mapArray[16][13] = new hexer.hex({blocked:true,classes:["wall"]});
 game.mapArray[17][13] = new hexer.hex({blocked:true,classes:["wall"]});

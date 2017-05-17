@@ -62,17 +62,8 @@ var game = {
         });
       });
       $('#next_turn').on('click',function() {
-        $('#action').text('next_turn');
-        for (var hero in game.heroes[game.state.turn]) {
-          if (game.heroes[game.state.turn].hasOwnProperty(hero)) {
-            game.heroes[game.state.turn][hero].new_turn();
-          }
-        }
-        var turn_ant = game.state.turn;
-        game.state.turn = game.state.turn === 'a'?'b':'a';
-        game.state.clear_hero();
-        $(this).text('Turn: '+game.state.turn.toUpperCase());
-        $('#tablero').removeClass('turn_'+turn_ant).addClass('turn_'+game.state.turn);
+        socket.emit('next_turn');
+        game.next_turn();
       });
       $('#heroes .stats select').change(game.state.print_preview);
       $('#orientation').on('input',function () {
@@ -101,6 +92,20 @@ var game = {
     }else{
       game.state.clear_action();
     }
+  },
+
+  next_turn: function () {
+    $('#action').text('next_turn');
+    for (var hero in game.heroes[game.state.turn]) {
+      if (game.heroes[game.state.turn].hasOwnProperty(hero)) {
+        game.heroes[game.state.turn][hero].new_turn();
+      }
+    }
+    var turn_ant = game.state.turn;
+    game.state.turn = game.state.turn === 'a'?'b':'a';
+    game.state.clear_hero();
+    $(this).text('Turn: '+game.state.turn.toUpperCase());
+    $('#tablero').removeClass('turn_'+turn_ant).addClass('turn_'+game.state.turn);
   },
 
   world: {
@@ -174,8 +179,6 @@ var game = {
   // Setup Hexagon Map
   mapsize_x: 30,
   mapsize_y: 30,
-
-  mapArray: hexer.MultiDimensionalArray(30,30),
 
   getMap: function (search) {
     if (search === undefined) {

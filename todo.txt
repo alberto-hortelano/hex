@@ -1,2 +1,4 @@
-1) Game without DOM
-2) Test
+- Server
+- Real turns
+- Game without DOM
+- Test
